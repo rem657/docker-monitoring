@@ -49,7 +49,7 @@ class ContainerObserver:
         """
         with open(config_file, 'r') as f:
             config = json.load(f)
-            self.list_emails = config['list_dest']
+            self.list_emails = config['list_rec']
             self.bot_email = config['bot_email']
             self.bot_pwd = config['bot_pwd']
         assert isinstance(self.list_emails, list)
