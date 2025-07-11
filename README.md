@@ -22,7 +22,8 @@ The `email_config.ini` file should look like this:
 {
     "bot_email": "your_sender_email@gmail.com",
     "bot_pwd": "your_gmail_app_password",
-    "list_rec": ["recipient1@example.com", "recipient2@example.com"]
+    "list_rec": ["recipient1@example.com", "recipient2@example.com"],
+    "ntfy_topic": "your_ntfy_topic"  # Optional, for Ntfy notifications
 }
 ```
 
@@ -31,16 +32,19 @@ The `email_config.ini` file should look like this:
 *   `bot_pwd`: The **App Password** for the sender's Gmail account. For security reasons, it is now necessary to 
 use an App Password instead of your regular account password. You can generate one from your Google Account settings.
 *   `list_rec`: A list of email addresses that will receive the notification.
+*  `ntfy_topic`: (Optional) If you want to use Ntfy for notifications, specify the topic here. This system will fallback
+on ntfy if the email fails to send. 
 
 ## Prerequisites
 *   Python 3.12
 *   Docker
+*   A Gmail account with App Password enabled (for sending emails)
 *   [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 ## Installation
 Clone the repository and install uv if you haven't already. Initiate the environment with the following command:
 ```bash
-cd docker-monitoring
+cd docker_monitoring
 uv sync
 ```
 Install the current package:
@@ -59,7 +63,7 @@ Then, run the following command, replacing `<CONTAINER_ID>` with the actual ID o
 monitor:
 
 ```bash
-python -m src.docker-monitoring -i <CONTAINER_ID> -c <PATH_TO_EMAIL_CONFIG> -r <REFRESH_RATE>
+python -m src.docker_monitoring -i <CONTAINER_ID> -c <PATH_TO_EMAIL_CONFIG> -r <REFRESH_RATE>
 ```
 
 ### Command-Line Arguments
@@ -70,5 +74,5 @@ python -m src.docker-monitoring -i <CONTAINER_ID> -c <PATH_TO_EMAIL_CONFIG> -r <
 ### Example
 To monitor a container with the ID `5486aea24593`, check its status every 5 seconds, and use a config file located at `conf/my_config.ini`:
 ```bash
-python -m src.docker-monitoring --id 5486aea24593 --refresh 5 --config conf/my_config.ini
+python -m src.docker_monitoring --id 5486aea24593 --refresh 5 --config conf/my_config.ini
 ```
