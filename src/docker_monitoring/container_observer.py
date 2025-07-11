@@ -5,6 +5,7 @@ import json
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import requests
 
 class ContainerObserver:
     def __init__(self, container_id: str, config_location: str = 'email_config.ini', refresh_rate: int = 60):
@@ -13,6 +14,7 @@ class ContainerObserver:
         self.list_emails = None
         self.bot_email = None
         self.bot_pwd = None
+        self.ntfy_topic = None
         self.refresh_rate = refresh_rate
         self.set_up_emails(config_location)
         self.client = docker.from_env()
@@ -52,12 +54,13 @@ class ContainerObserver:
             self.list_emails = config['list_rec']
             self.bot_email = config['bot_email']
             self.bot_pwd = config['bot_pwd']
+            self.ntfy_topic = config['ntfy_topic']
         assert isinstance(self.list_emails, list)
         assert isinstance(self.bot_email, str)
         assert isinstance(self.bot_pwd, str)
 
 
-    def notify_accounts(self, msg: str):
+    def notify_email_accounts(self, msg: str):
         """
         Sends an email to the list of accounts.
         :param msg:
@@ -72,6 +75,36 @@ class ContainerObserver:
             for email in self.list_emails:
                 message["To"] = email
                 server.send_message(msg=message, from_addr=self.bot_email, to_addrs=email)
+
+    def notify_topic(self, msg: str):
+        """
+        Sends a push notification using ntfy.
+        :param msg: The message to send.
+        :type msg: Str
+        """
+        requests.post(
+            f"https://ntfy.sh/{self.ntfy_topic}",
+            data=msg.encode('utf-8'),
+            headers={
+                "Title":f"Docker container {self.container_id} has stopped running",
+                "Priority":"urgent",
+                "Tags":"warning"
+            }
+        )
+
+    def notify_accounts(self, msg: str):
+        """
+        This function sends the notification to emails and falls back on ntfy if the email fails.
+        :param msg: The message to send.
+        :return:
+        """
+        try:
+            self.notify_email_accounts(msg)
+        except Exception as e:
+            print("Error sending emails. Falling back on ntfy api.")
+            print(f"Previous error : {e}")
+            self.notify_topic(msg)
+            print("Notification sent successfully.")
 
     def observe_container(self):
         """

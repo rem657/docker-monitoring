@@ -92,4 +92,4 @@ fabric.properties
 # End of https://www.toptal.com/developers/gitignore/api/pycharm+all
 /email_config.ini
 /src/docker_monitoring.egg-info
-/src/docker-monitoring/__pycache__
+/src/docker_monitoring/__pycache__
