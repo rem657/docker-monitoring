@@ -9,6 +9,9 @@ dependencies = [
     "requests>=2.32.4",
 ]
 
+[project.scripts]
+docker_monitoring = "docker_monitoring.__main__:main"
+
 [build-system]
 requires = ["setuptools>=80.9.0"]
 build-backend = "setuptools.build_meta"
@@ -18,3 +21,11 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.uv.sources]
+docker-monitoring = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "docker-monitoring",
+]
